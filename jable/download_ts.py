@@ -49,11 +49,6 @@ def print_percent():
 
 class M3u8():
     def __init__(self, page_url, m3u8_link):
-        # self.page_url = page_url
-        # self.url_prefix = ''
-        # self.m3u8_path = dirname + '/' + 'm3u8.m3u8'
-        # self.dirname = dirname
-        # self.m3u8_link()
         self.m3u8_link = m3u8_link
         self.page_url = page_url
         self.dir = self.create_dir(page_url)
@@ -96,7 +91,11 @@ class M3u8():
         temp.close()
         response = requests.get(
             self.m3u8_link, headers=get_headers(), timeout=10)
+        status_code = response.status_code
+        log('self.m3u8_link', self.m3u8_link)
+        # log('download_m3u8_file status_code', status_code)
         if response.status_code == 200:
+            # log('download_m3u8_file content', response.content)
             save(self.m3u8_file_path, response.content)
         else:
             raise Exception("not 200")
@@ -158,7 +157,7 @@ class ThreadDownload():
                 print_percent()
         for t in threads:
             t.join()
-        log('done join')
+        log('threads done join')
 
     @staticmethod
     def check_file(url, dirname):
@@ -171,9 +170,9 @@ class ThreadDownload():
     def download(url, dirname):
         try:
             sema.acquire()
-            response = requests.get(url, headers=get_headers(), timeout=10, )
+            response = requests.get(url, headers=get_headers(), timeout=10)
             status_code = response.status_code
-            # log('status_code', status_code)
+            log('status_code', status_code)
             if status_code == 200:
                 filename = url.split('/')[-1]
                 path = f'{dirname}/{filename}'

@@ -17,7 +17,7 @@ headers = {
     # 'Connection': 'closer',
     # 'Pragma': 'no-cache',
     # 'Cache-Control': 'no-cache',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36',
+    # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36',
     # 'Accept': '*/*',
     # 'Sec-Fetch-Site': 'cross-site',
     # 'Sec-Fetch-Mode': 'no-cors',
@@ -25,6 +25,17 @@ headers = {
     # 'Accept-Language': "zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7,zh-HK;q=0.6,ja;q=0.5,ko;q=0.4",
     # 'Referer': 'https://asianclub.tv/v/4-63qhzz88pxmed',
     # 'Range': 'bytes=0-',
+    # 'accept': '*/*',
+    # 'accept-encoding': 'identity;q=1, *;q=0',
+    # 'accept-language': 'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7,zh-HK;q=0.6,ja;q=0.5,ko;q=0.4',
+    # 'range': 'bytes=0-',
+    'referer': 'https://vidoza.net/',
+    'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
+    # 'sec-ch-ua-mobile': '?0',
+    # 'sec-fetch-dest': 'video',
+    # 'sec-fetch-mode': 'no-cors',
+    # 'sec-fetch-site': 'same-site',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36',
 }
 proxies = {
     'https': 'https://127.0.0.1:1080',
@@ -76,7 +87,7 @@ def log(*args, **kwargs):
         print(dt, *args, file=f, **kwargs)
 
 
-def hpjav_download1(url, filename):
+def hpjav_download_mp4(url, filename):
     # 获取文件的大小和文件名
     # url = "http://a238.static-file.com:8080/video/9fd38b603e9a14b9c8ea97634daed9c3/5fb3b3bf/cache/5503649e7b49a781e7ab9d00a2dd40cb.mp4?s=128"
 
@@ -85,22 +96,22 @@ def hpjav_download1(url, filename):
         url,).headers['Content-Length'])
 
     # 线程数
-    thread_number = 8
+    thread_number = 2
     # 信号量，同时只允许3个线程运行
     threading.BoundedSemaphore(thread_number)
     # 默认3线程现在，也可以通过传参的方式设置线程数
     mtd_list = []
     start = 0
     end = 0
-
+    path = 'video/' + filename
     # 请空并生成文件
-    tempf = open(filename, 'w')
+    tempf = open(path, 'w')
     tempf.close()
     # rb+ ，二进制打开，可任意位置读写
     step = math.floor(filesize / thread_number)
     mb = filesize / 1024.0 / 1024.0
 
-    with open(filename, 'rb+') as f:
+    with open(path, 'rb+') as f:
         fileno = f.fileno()
         # 如果文件大小为11字节，那就是获取文件0-10的位置的数据。如果end = 10，说明数据已经获取完了。
         while end < filesize:
@@ -129,5 +140,5 @@ def hpjav_download(url, filename):
     os.system(cmd)
 
 if __name__ == "__main__":
-    url = 'https://str08.vidoza.net/nvl4viulzeeeieno3u6bpbvdnt6m6mmcgsjtezpiz2vveiywxjhk6fvk4hra/v.mp4'
-    hpjav_download1(url, 'filename')
+    url = 'https://lising-39.cdnamz.me/videos/ohdpsinm1t818e7biwrx3hrzfa.mp4'
+    hpjav_download_mp4(url, 'filename.mp4')

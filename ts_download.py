@@ -1,5 +1,5 @@
 import copy
-from hpjav.hpjav import hpjav_download1
+from hpjav.hpjav import hpjav_download_mp4
 import threading
 import m3u8
 import time
@@ -8,18 +8,7 @@ import os
 import requests
 
 headers = {
-    # 'Host': 'f94dakfbkg.nincontent.com',
-    # 'Connection': 'keep-alive',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36',
-    # 'Accept': '*/*',
-    # 'Origin': 'https://ninjastream.to',
-    # 'Sec-Fetch-Site': 'cross-site',
-    # 'Sec-Fetch-Mode': 'cors',
-    # 'Sec-Fetch-Dest': 'empty',
-    # 'Referer': 'https://ninjastream.to/watch/Ng9Qnz8GqQVKb',
-    # 'Accept-Encoding': 'identity',
-    # 'Accept-Language': 'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7,zh-HK;q=0.6,ja;q=0.5,ko;q=0.4',
-
 }
 
 
@@ -83,8 +72,6 @@ def m3u8_file_list1(path, url_prefix):
         o[uri] = header
         o['ts_file'] = str(i).zfill(5) + '.ts'
         ts_list.append(o)
-    # print('ts_list', ts_list[0])
-    # print('ts_list', ts_list[1])
     return ts_list
 
 
@@ -147,8 +134,6 @@ class Download_M3U8():
         url_prefix = '/'.join(t)
 
         ts_list = m3u8_file_list(path)
-        # download_all_ts(ts_list, path)
-        # print('len(ts_list)', len(ts_list))
         download_all_ts(ts_list, path, url_prefix)
 
 

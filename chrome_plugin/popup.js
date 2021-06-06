@@ -11,10 +11,25 @@ document.getElementById('press').addEventListener('click', async () => {
   const context = background && background.backgroundContext
   let host = await context.getCurrentHost()
   context.log('host', host)
+  context.log('host2' )
 
   if (host == 'hpjav.tv') {
     context.hpjavDownloadVideo()
   } else if (host == 'jable.tv') {
     context.jableTvDownloadVideo()
   }
+})
+
+document.getElementById('show-url').addEventListener('click', async () => {
+  const background = chrome.extension.getBackgroundPage()
+  const context = background && background.backgroundContext
+  context.log('chrome.tabs.executeScript', chrome.tabs.executeScript)
+  // let host = await context.getCurrentHost()
+  // context.log('host', host)
+
+  // if (host == 'hpjav.tv') {
+  //   context.hpjavDownloadVideo()
+  // } else if (host == 'jable.tv') {
+  //   context.jableTvDownloadVideo()
+  // }
 })

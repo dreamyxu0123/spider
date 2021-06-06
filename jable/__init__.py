@@ -29,7 +29,7 @@ class JableTv():
 
     def get_m3u8_file_link(self):
         response = requests.get(
-            self.page_url, headers=get_headers(), timeout=2)
+            self.page_url, headers=get_headers())
         print('response', response)
         soup = bs(response.text, 'lxml')
         r = soup.find_all('link', href=True)

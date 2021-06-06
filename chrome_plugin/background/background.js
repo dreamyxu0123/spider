@@ -1,27 +1,30 @@
 const log = console.log.bind(console)
+
 const hpjavDownloadVideo = async function () {
-  let tab = await getCurrentTab()
-  console.log('tabId', tab.id)
-  chrome.tabs.executeScript(
-    tab.id,
-    {
-      code: `window.location.pathname.split('/')[2]`,
-    },
-    (result) => {
-      let videoId = result[0]
-      let url = window.backgroundContext.videoLinks[videoId]
-      console.log('url', url)
-      Ajax(
-        'post',
-        'http://localhost:5000/hpjav_download',
-        { url: url, filename: videoId },
-        function (result) {
-          alert(result)
-        },
-      )
+  let code = `window.location.pathname.split('/')[2]`
+  let result = await executeScript(code)
+  let videoId = result[0]
+  let url = window.backgroundContext.videoLinks[videoId]
+  let video_type = url.split('.').pop()
+  // log('url', url)
+  Ajax(
+    'post',
+    'http://127.0.0.1:5000/hpjav_download',
+    { url: url, filename: videoId, video_type },
+    function (result) {
+      alert(result)
     },
   )
 }
+const executeScript = async function (code) {
+  let tab = await getCurrentTab()
+  return new Promise((resolve, reject) => {
+    chrome.tabs.executeScript(tab.id, { code: code }, (result) => {
+      resolve(result)
+    })
+  })
+}
+
 const jableTvDownloadVideo = async function () {
   let tab = await getCurrentTab()
   chrome.tabs.executeScript(
@@ -79,8 +82,10 @@ let appendHtml = function (element, html) {
 
 let logURL = function (requestDetails) {
   let url = requestDetails.url
-  // console.log('hello url', url)
-  if (url.endsWith('.m3u8', url.length)) {
+  // log('logURL url', url)
+  let bool =
+    url.endsWith('.m3u8', url.length) || url.endsWith('720p.mp4', url.length)
+  if (bool) {
     chrome.tabs.executeScript(
       requestDetails.tabId,
       {
@@ -91,27 +96,7 @@ let logURL = function (requestDetails) {
       },
     )
     console.log('hello url', url)
-    // chrome.tabs.executeScript(
-    //   requestDetails.tabId,
-    //   {
-    //     code: `
-    //       setTimeout(() => {
-    //         let playButton = document.querySelector('.play-button')
-    //         playButton.click()
-    //       }, 3000)
-    // `,
-    //   },
-    //   () => {
-    //     log('Inject script success!')
-    //   }
-    // )
   }
-  // let svg = document.querySelector('svg')
-  // if (svg) {
-  //   svg.click()
-  // }
-  // let html = `<div>${requestDetails.url}</div>`
-  // appendHtml(document.body, html)
 }
 const M3U8_PATTERN_ARRAY = ['*://*/*']
 chrome.webRequest.onBeforeRequest.addListener(logURL, {

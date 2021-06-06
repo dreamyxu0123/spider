@@ -1,5 +1,4 @@
 const Ajax = function (method, path, data, callback) {
-  // 创建 AJAX 对象
   let r = new XMLHttpRequest()
   // 设置请求方法和请求地址
   r.open(method, path, true)
