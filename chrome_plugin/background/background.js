@@ -60,7 +60,8 @@ const getCurrentHost = async function () {
     )
   })
 }
-
+// "https://i2d1v3sopqtxwvkcx96v.nincontent.com/ZWNESzBlNyt2MzZLM3gxRXFxUFgyRG1kMXBCZ05HQmtmSCtyT09DOTVORU8vR3FlRXRVek5NTVdaMUVGVWt4TVJTOGNrbGxrTm8wQ2V4bWczUkpkQ1o0UUtpblYxUWpFRG5IVWdCNG9iMHA0aFVqdkpUcThQdDFwUFRpcCt2U3pHN2l3SnE5U2NjdG5xUnUyV1dBTWpnPT0=/m2Q5j8nCMxuE4qf2c8E8Qg/index.m3u8"
+// "https://i2d1v3sopqtxwvkcx96v.nincontent.com/ZWNESzBlNyt2MzZLM3gxRXFxUFgyRG1kMXBCZ05HQmtmSCtyT09DOTVORU8vR3FlRXRVek5NTVdaMUVGVWt4TVJTOGNrbGxrTm8wQ2V4bWczUkpkQ1o0UUtpblYxUWpFRG5IVWdCNG9iMHA0aFVqdkpUcThQdDFwUFRpcCt2U3pHN2l3SnE5U2NjdG5xUnUyV1dBTWpnPT0=/m2Q5j8nCMxuE4qf2c8E8Qg/2_720p.m3u8"
 function getCurrentTab() {
   return new Promise((resolve) =>
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) =>
@@ -68,34 +69,42 @@ function getCurrentTab() {
     ),
   )
 }
+
+function post() {
+  Ajax('POST', 'http://localhost:5000/', {}, (response) => {
+    log('response', response)
+  })
+}
 window['backgroundContext'] = {
   log: console.log.bind(console),
   videoLinks: {},
   hpjavDownloadVideo,
   jableTvDownloadVideo,
   getCurrentHost,
+  post,
+  post,
 }
 
 let appendHtml = function (element, html) {
   element.insertAdjacentHTML('beforeend', html)
 }
 
-let logURL = function (requestDetails) {
+let logURL = async function (requestDetails) {
   let url = requestDetails.url
   // log('logURL url', url)
   let bool =
     url.endsWith('.m3u8', url.length) || url.endsWith('720p.mp4', url.length)
   if (bool) {
-    chrome.tabs.executeScript(
-      requestDetails.tabId,
-      {
-        code: `window.location.pathname.split('/')[2]`,
-      },
-      (result) => {
-        window.backgroundContext.videoLinks[result[0]] = url
-      },
-    )
-    console.log('hello url', url)
+    const host = await getCurrentHost()
+    // window.backgroundContext.videoLinks[host] = url
+    const videoLinks = window.backgroundContext.videoLinks
+    if (videoLinks[host] && !videoLinks[host].includes(url)) {
+      log('videoLinks[host]', videoLinks[host])
+      videoLinks[host].push(url)
+    } else {
+      videoLinks[host] = [url]
+    }
+    // console.log('hello url', url)
   }
 }
 const M3U8_PATTERN_ARRAY = ['*://*/*']

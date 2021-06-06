@@ -11,7 +11,7 @@ document.getElementById('press').addEventListener('click', async () => {
   const context = background && background.backgroundContext
   let host = await context.getCurrentHost()
   context.log('host', host)
-  context.log('host2' )
+  context.log('host2')
 
   if (host == 'hpjav.tv') {
     context.hpjavDownloadVideo()
@@ -23,7 +23,21 @@ document.getElementById('press').addEventListener('click', async () => {
 document.getElementById('show-url').addEventListener('click', async () => {
   const background = chrome.extension.getBackgroundPage()
   const context = background && background.backgroundContext
-  context.log('chrome.tabs.executeScript', chrome.tabs.executeScript)
+  const { log, Ajax, post } = context
+  const host = await context.getCurrentHost()
+  const hostLinks = context.videoLinks[host]
+  // context.log('context.videoLinks', context.videoLinks)
+  hostLinks.forEach((url) => {
+    let element = document.createElement('a')
+    // div.className = 'send-btn enable'
+    element.innerHTML = url.split('/').pop()
+    element.onclick = function () {
+      log('onclick')
+      post()
+    }
+    document.body.appendChild(element)
+  })
+
   // let host = await context.getCurrentHost()
   // context.log('host', host)
 
