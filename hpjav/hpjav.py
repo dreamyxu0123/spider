@@ -1,3 +1,4 @@
+import uuid
 import threading
 import sys
 import requests
@@ -12,29 +13,8 @@ import socks
 
 
 headers = {
-    # 'Host': "www714.o0-2.com",
-    # 'Connection': 'keep-alive',
-    # 'Connection': 'closer',
-    # 'Pragma': 'no-cache',
-    # 'Cache-Control': 'no-cache',
-    # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36',
-    # 'Accept': '*/*',
-    # 'Sec-Fetch-Site': 'cross-site',
-    # 'Sec-Fetch-Mode': 'no-cors',
-    # 'Sec-Fetch-Dest': 'video',
-    # 'Accept-Language': "zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7,zh-HK;q=0.6,ja;q=0.5,ko;q=0.4",
-    # 'Referer': 'https://asianclub.tv/v/4-63qhzz88pxmed',
-    # 'Range': 'bytes=0-',
-    # 'accept': '*/*',
-    # 'accept-encoding': 'identity;q=1, *;q=0',
-    # 'accept-language': 'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7,zh-HK;q=0.6,ja;q=0.5,ko;q=0.4',
-    # 'range': 'bytes=0-',
     'referer': 'https://vidoza.net/',
     'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
-    # 'sec-ch-ua-mobile': '?0',
-    # 'sec-fetch-dest': 'video',
-    # 'sec-fetch-mode': 'no-cors',
-    # 'sec-fetch-site': 'same-site',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36',
 }
 proxies = {
@@ -87,7 +67,12 @@ def log(*args, **kwargs):
         print(dt, *args, file=f, **kwargs)
 
 
-def hpjav_download_mp4(url, filename):
+def create_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+def hpjav_download_mp4(url, filename='', page_url=''):
     # 获取文件的大小和文件名
     # url = "http://a238.static-file.com:8080/video/9fd38b603e9a14b9c8ea97634daed9c3/5fb3b3bf/cache/5503649e7b49a781e7ab9d00a2dd40cb.mp4?s=128"
 
@@ -103,15 +88,22 @@ def hpjav_download_mp4(url, filename):
     mtd_list = []
     start = 0
     end = 0
-    path = 'video/' + filename
+    dirname = uuid.uuid4().hex
+    path = 'video/' + dirname
+    video_path = os.path.join(path, 'mp4.mp4')
+    create_dir(path)
+    readme = os.path.join(path, 'readme.txt')
+    with open(readme, 'w+', encoding='utf-8') as f:
+        f.write(page_url)
+
     # 请空并生成文件
-    tempf = open(path, 'w')
+    tempf = open(video_path, 'w')
     tempf.close()
     # rb+ ，二进制打开，可任意位置读写
     step = math.floor(filesize / thread_number)
     mb = filesize / 1024.0 / 1024.0
 
-    with open(path, 'rb+') as f:
+    with open(video_path, 'rb+') as f:
         fileno = f.fileno()
         # 如果文件大小为11字节，那就是获取文件0-10的位置的数据。如果end = 10，说明数据已经获取完了。
         while end < filesize:
@@ -134,10 +126,13 @@ def hpjav_download_mp4(url, filename):
         for i in mtd_list:
             i.join()
     return mb
+
+
 def hpjav_download(url, filename):
     cmd = f'N_m3u8DL-CLI_v2.9.5.exe {url}'
     # print(cmd)
     os.system(cmd)
+
 
 if __name__ == "__main__":
     url = 'https://lising-39.cdnamz.me/videos/ohdpsinm1t818e7biwrx3hrzfa.mp4'

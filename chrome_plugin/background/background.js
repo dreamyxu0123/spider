@@ -20,6 +20,7 @@ const executeScript = async function (code) {
   let tab = await getCurrentTab()
   return new Promise((resolve, reject) => {
     chrome.tabs.executeScript(tab.id, { code: code }, (result) => {
+      // log('executeScript code', code, 'result', result)
       resolve(result)
     })
   })
@@ -62,16 +63,37 @@ const getCurrentHost = async function () {
 }
 // "https://i2d1v3sopqtxwvkcx96v.nincontent.com/ZWNESzBlNyt2MzZLM3gxRXFxUFgyRG1kMXBCZ05HQmtmSCtyT09DOTVORU8vR3FlRXRVek5NTVdaMUVGVWt4TVJTOGNrbGxrTm8wQ2V4bWczUkpkQ1o0UUtpblYxUWpFRG5IVWdCNG9iMHA0aFVqdkpUcThQdDFwUFRpcCt2U3pHN2l3SnE5U2NjdG5xUnUyV1dBTWpnPT0=/m2Q5j8nCMxuE4qf2c8E8Qg/index.m3u8"
 // "https://i2d1v3sopqtxwvkcx96v.nincontent.com/ZWNESzBlNyt2MzZLM3gxRXFxUFgyRG1kMXBCZ05HQmtmSCtyT09DOTVORU8vR3FlRXRVek5NTVdaMUVGVWt4TVJTOGNrbGxrTm8wQ2V4bWczUkpkQ1o0UUtpblYxUWpFRG5IVWdCNG9iMHA0aFVqdkpUcThQdDFwUFRpcCt2U3pHN2l3SnE5U2NjdG5xUnUyV1dBTWpnPT0=/m2Q5j8nCMxuE4qf2c8E8Qg/2_720p.m3u8"
-function getCurrentTab() {
+const getCurrentTab = function () {
   return new Promise((resolve) =>
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) =>
-      resolve(tabs[0]),
-    ),
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      resolve(tabs[0])
+    }),
   )
 }
 
-function post() {
-  Ajax('POST', 'http://localhost:5000/', {}, (response) => {
+const getHref = async function () {
+  const code = `window.location.href`
+  const href = await executeScript(code)
+  return href[0]
+}
+
+const request = function ({ videoLink, href }) {
+  let videoType = ''
+  if (
+    videoLink.endsWith('.m3u8', videoLink.length) ||
+    videoLink.search('.m3u8') != -1
+  ) {
+    videoType = 'm3u8'
+  } else {
+    videoType = 'mp4'
+  }
+  log('videoType', videoType)
+  const data = {
+    video_link: videoLink,
+    page_url: href,
+    video_type: videoType,
+  }
+  Ajax('POST', 'http://localhost:5000/', data, (response) => {
     log('response', response)
   })
 }
@@ -81,30 +103,34 @@ window['backgroundContext'] = {
   hpjavDownloadVideo,
   jableTvDownloadVideo,
   getCurrentHost,
-  post,
-  post,
+  getHref,
+  request,
 }
 
-let appendHtml = function (element, html) {
+const appendHtml = function (element, html) {
   element.insertAdjacentHTML('beforeend', html)
 }
 
-let logURL = async function (requestDetails) {
+const logURL = async function (requestDetails) {
   let url = requestDetails.url
   // log('logURL url', url)
   let bool =
-    url.endsWith('.m3u8', url.length) || url.endsWith('720p.mp4', url.length)
+    url.endsWith('.m3u8', url.length) ||
+    url.endsWith('720p.mp4', url.length) ||
+    url.search('.m3u8') != -1 ||
+    url.search('.mp4') != -1
   if (bool) {
-    const host = await getCurrentHost()
-    // window.backgroundContext.videoLinks[host] = url
+    const href = await getHref()
+    // log('log url href', href)
+    // window.backgroundContext.videoLinks[href] = url
     const videoLinks = window.backgroundContext.videoLinks
-    if (videoLinks[host] && !videoLinks[host].includes(url)) {
-      log('videoLinks[host]', videoLinks[host])
-      videoLinks[host].push(url)
+    if (videoLinks[href]) {
+      if (!videoLinks[href].includes(url)) {
+        videoLinks[href].push(url)
+      }
     } else {
-      videoLinks[host] = [url]
+      videoLinks[href] = [url]
     }
-    // console.log('hello url', url)
   }
 }
 const M3U8_PATTERN_ARRAY = ['*://*/*']

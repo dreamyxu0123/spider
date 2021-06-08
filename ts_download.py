@@ -1,3 +1,4 @@
+import uuid
 import copy
 from hpjav.hpjav import hpjav_download_mp4
 import threading
@@ -124,11 +125,17 @@ def download_all_ts(ts_list, path, url_prefix):
 
 class Download_M3U8():
     @staticmethod
-    def start(m3u8_url, dirname=''):
+    def start(m3u8_url, dirname='', page_url=''):
+
         if dirname == '':
-            dirname = random.randint(1000, 9999)
+            dirname = uuid.uuid4().hex
         path = "video/" + dirname
         create_dir(path)
+
+        readme = os.path.join(path, 'readme.txt')
+        with open(readme, 'w+', encoding='utf-8') as f:
+            f.write(page_url)
+
         download_m3u8_file(path + '/m3u8.m3u8', m3u8_url)
         t = m3u8_url.split('/')[:-1]
         url_prefix = '/'.join(t)

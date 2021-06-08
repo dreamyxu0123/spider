@@ -23,17 +23,19 @@ document.getElementById('press').addEventListener('click', async () => {
 document.getElementById('show-url').addEventListener('click', async () => {
   const background = chrome.extension.getBackgroundPage()
   const context = background && background.backgroundContext
-  const { log, Ajax, post } = context
-  const host = await context.getCurrentHost()
-  const hostLinks = context.videoLinks[host]
+  const { log, request } = context
+  const href = await context.getHref()
+  const videoLinks = context.videoLinks[href]
+  log('show-url videoLinks', videoLinks)
   // context.log('context.videoLinks', context.videoLinks)
-  hostLinks.forEach((url) => {
-    let element = document.createElement('a')
+  videoLinks.forEach((url) => {
+    let element = document.createElement('div')
     // div.className = 'send-btn enable'
     element.innerHTML = url.split('/').pop()
     element.onclick = function () {
       log('onclick')
-      post()
+      request({ href, videoLink: url })
+      alert(url)
     }
     document.body.appendChild(element)
   })

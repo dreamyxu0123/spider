@@ -1,11 +1,11 @@
-import json
+from ts_download import Download_M3U8
 import sys
 from utils import load
 sys.path.extend(load('./env_path.json'))
-from jable import jable_tv_download
-from hpjav.hpjav import hpjav_download_mp4
 from flask import request, Flask, jsonify
-from ts_download import Download_M3U8
+from hpjav.hpjav import hpjav_download_mp4
+from jable import jable_tv_download
+import json
 
 
 # print(sys.path)
@@ -39,12 +39,23 @@ def jable_tv():  # 视图函数
     url = json_data.get('url')
     print('url', url)
     jable_tv_download(url)
-    return 'Hello World'  # response，最终给浏览器返回的内容
+    return 'Hello World'
 
 
 @app.route('/', methods=['POST'])
-def hello_world():  # 视图函数
-    return 'Hello World'  # response，最终给浏览器返回的内容
+def hello_world():
+    data = request.get_data()
+    json_data = json.loads(data.decode('utf-8'))
+    print('json_data', json_data)
+    video_link = json_data['video_link']
+    page_url = json_data['page_url']
+    video_type = json_data['video_type']
+    if video_type == 'mp4':
+        mb = hpjav_download_mp4(video_link, page_url=page_url)
+    # print(url, filename)
+    elif video_type == 'm3u8':
+        Download_M3U8.start(video_link, page_url=page_url)
+    return 'Hello World'
 
 
 if __name__ == '__main__':
