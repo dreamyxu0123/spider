@@ -5,6 +5,8 @@ function injectTheScript() {
     chrome.tabs.executeScript(tabs[0].id, { file: 'utilities.js' })
   })
 }
+
+
 // adding listener to your button in popup window
 document.getElementById('press').addEventListener('click', async () => {
   const background = chrome.extension.getBackgroundPage()
@@ -26,26 +28,22 @@ document.getElementById('show-url').addEventListener('click', async () => {
   const { log, request } = context
   const href = await context.getHref()
   const videoLinks = context.videoLinks[href]
-  log('show-url videoLinks', videoLinks)
-  // context.log('context.videoLinks', context.videoLinks)
-  videoLinks.forEach((url) => {
+  videoLinks && videoLinks.forEach((videoUrl) => {
     let element = document.createElement('div')
     // div.className = 'send-btn enable'
-    element.innerHTML = url.split('/').pop()
+    element.innerHTML = videoUrl
+    // element.innerHTML = url.split('/').pop()
+    element.style = 'border: 1px gray solid; word-wrap: break-word;'
     element.onclick = function () {
-      log('onclick')
-      request({ href, videoLink: url })
-      alert(url)
+      let host = new URL(href);
+      let hostname = host.hostname
+      let host_type = ''
+      if (hostname == 'www2.javhdporn.net') {
+        host_type = 'javhdporn'
+      }
+      request({ href, videoLink: videoUrl, host_type: host_type })
+      alert(videoUrl)
     }
     document.body.appendChild(element)
   })
-
-  // let host = await context.getCurrentHost()
-  // context.log('host', host)
-
-  // if (host == 'hpjav.tv') {
-  //   context.hpjavDownloadVideo()
-  // } else if (host == 'jable.tv') {
-  //   context.jableTvDownloadVideo()
-  // }
 })

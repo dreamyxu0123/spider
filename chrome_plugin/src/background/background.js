@@ -61,8 +61,7 @@ const getCurrentHost = async function () {
     )
   })
 }
-// "https://i2d1v3sopqtxwvkcx96v.nincontent.com/ZWNESzBlNyt2MzZLM3gxRXFxUFgyRG1kMXBCZ05HQmtmSCtyT09DOTVORU8vR3FlRXRVek5NTVdaMUVGVWt4TVJTOGNrbGxrTm8wQ2V4bWczUkpkQ1o0UUtpblYxUWpFRG5IVWdCNG9iMHA0aFVqdkpUcThQdDFwUFRpcCt2U3pHN2l3SnE5U2NjdG5xUnUyV1dBTWpnPT0=/m2Q5j8nCMxuE4qf2c8E8Qg/index.m3u8"
-// "https://i2d1v3sopqtxwvkcx96v.nincontent.com/ZWNESzBlNyt2MzZLM3gxRXFxUFgyRG1kMXBCZ05HQmtmSCtyT09DOTVORU8vR3FlRXRVek5NTVdaMUVGVWt4TVJTOGNrbGxrTm8wQ2V4bWczUkpkQ1o0UUtpblYxUWpFRG5IVWdCNG9iMHA0aFVqdkpUcThQdDFwUFRpcCt2U3pHN2l3SnE5U2NjdG5xUnUyV1dBTWpnPT0=/m2Q5j8nCMxuE4qf2c8E8Qg/2_720p.m3u8"
+
 const getCurrentTab = function () {
   return new Promise((resolve) =>
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -76,8 +75,18 @@ const getHref = async function () {
   const href = await executeScript(code)
   return href[0]
 }
+const javhdporn = function (data) {
+  Ajax('POST', 'http://localhost:5000/javhdporn', data, (response) => {
+    log('response', response)
+  })
+}
 
-const request = function ({ videoLink, href }) {
+const request = function (requestData) {
+  let { videoLink, href, host_type } = requestData
+  if (host_type == 'javhdporn') {
+    javhdporn(requestData)
+    return
+  }
   let videoType = ''
   if (
     videoLink.endsWith('.m3u8', videoLink.length) ||
@@ -110,8 +119,17 @@ window['backgroundContext'] = {
 const appendHtml = function (element, html) {
   element.insertAdjacentHTML('beforeend', html)
 }
-
+const bodyOnload = function () {
+  Object.prototype.__defineGetter__ = null
+  document.querySelector('.play-button').click()
+  document.domain = 'blob:https://www2.javhdporn.net'
+  setTimeout(() => {
+    document.querySelector('.jw-display-icon-container').click()
+  }, 1000)
+}
 const logURL = async function (requestDetails) {
+  // const code = `document.body.onload = ${bodyOnload.toString()}`
+  // await executeScript(code)
   let url = requestDetails.url
   // log('logURL url', url)
   let bool =
@@ -137,3 +155,4 @@ const M3U8_PATTERN_ARRAY = ['*://*/*']
 chrome.webRequest.onBeforeRequest.addListener(logURL, {
   urls: M3U8_PATTERN_ARRAY,
 })
+

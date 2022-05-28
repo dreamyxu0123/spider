@@ -1,12 +1,14 @@
-import uuid
 import copy
-from hpjav.hpjav import hpjav_download_mp4
-import threading
-import m3u8
-import time
-import random
 import os
+import random
+import threading
+import time
+import uuid
+
 import requests
+
+import m3u8
+from hpjav.hpjav import hpjav_download_mp4
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36',
@@ -33,7 +35,8 @@ def download_m3u8_file(path, m3u8_url):
     temp = open(path, 'w')
     temp.close()
     r = requests.get(
-        m3u8_url, headers=headers, timeout=10,)
+        m3u8_url, headers=headers, timeout=10)
+    print('r.status_code', r.status_code)
     if r.status_code == 200:
         save(path, r.content)
     else:
@@ -147,7 +150,7 @@ class Download_M3U8():
     # 1. 获取所有ts url
     # 2. 多线程下载
 if __name__ == '__main__':
-    m3u8_url = 'https://kqcpz7z9wy8cwpxnqbhi.nincontent.com/K21nVnFLSWx1MjhJUVFwSmlUTHlkYTVrOTV2bDFSd3ZmcFhVc1p6Zk1KZ2U4ZVQwV1dwTHA3WmZQUmVWZko1UzMxMS9WMHF4bFg5anZOaStiVVIwRUZRWEhOTlk4RXVuYnNoaUk5TStDWUlFV0s0YmF5OTcrWVprNUhuWmtHRkx6MGQ4SFpxYmhGZ0pFOUNRUUlCUkdnPT0=/0Cb-bkJCstpygcntbRT3iw/2_720p.m3u8'
+    m3u8_url = 'https://delivery371.akamai-cdn-content.com/hls2/01/02546/up39q1lpl8n7_n/index-v1-a1.m3u8?t=HqUKQnWlWXMSNRdhygv3PIMISu1xV0G-4WkRwMUJ3qs&s=1650634090&e=21600&f=12734798&srv=sto095&client=103.152.34.230'
     dirname = '161940.mp4'
     # get_filename()
     Download_M3U8.start(m3u8_url, dirname)

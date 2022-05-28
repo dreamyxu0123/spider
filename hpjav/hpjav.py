@@ -1,26 +1,48 @@
-import uuid
-import threading
-import sys
-import requests
-import time
-import os
-from urllib.parse import urlparse
 import math
-import socket
-import socks
+import os
+import sys
+import threading
+import time
+import uuid
+from urllib.parse import urlparse
+
+import requests
+
+# import socket
+# import socks
 # socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", 1080)
 # socket.socket = socks.socksocket
 
 
 headers = {
-    'referer': 'https://vidoza.net/',
+    "range": "bytes=0-",
     'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36',
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36",
+    "referer": "https://www319.ff-01.com/token=McMXFn6s49SkwvyWi0mpqA/1653408662/218.102.0.0/153/a/81/cd7ea4ecdee9075c852282c61563781a-1080p.mp4",
+
 }
-proxies = {
-    'https': 'https://127.0.0.1:1080',
-    'http': 'http://127.0.0.1:1080'
+headers = {
+  "Host": "www319.ff-01.com",
+  "Connection": "keep-alive",
+  "Pragma": "no-cache",
+  "Cache-Control": "no-cache",
+  "sec-ch-ua": 'Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101',
+  "sec-ch-ua-mobile": "?0",
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36",
+  "sec-ch-ua-platform": "Windows",
+  "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+  "Sec-Fetch-Site": "same-origin",
+  "Sec-Fetch-Mode": "no-cors",
+  "Sec-Fetch-Dest": "image",
+  "Referer": "https://www319.ff-01.com/token=McMXFn6s49SkwvyWi0mpqA/1653408662/218.102.0.0/153/a/81/cd7ea4ecdee9075c852282c61563781a-1080p.mp4",
+  "Accept-Encoding": "gzip, deflate, br",
+  "Accept-Language": "zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7,zh-HK;q=0.6,ja;q=0.5,ko;q=0.4",
+
 }
+# proxies = {
+#     'https': 'https://127.0.0.1:7890',
+#     'http': 'http://127.0.0.1:7890'
+# }
 progress = {}
 
 
@@ -77,11 +99,16 @@ def hpjav_download_mp4(url, filename='', page_url=''):
     # url = "http://a238.static-file.com:8080/video/9fd38b603e9a14b9c8ea97634daed9c3/5fb3b3bf/cache/5503649e7b49a781e7ab9d00a2dd40cb.mp4?s=128"
 
     # filename = url.split('/')[-1]
-    filesize = int(requests.head(
-        url,).headers['Content-Length'])
+    filesize = int(
+      requests.head(url,
+      # verify=False,
+      headers=headers
+      # proxies=proxies
+      ).headers['Content-Length'])
+    print('filesize', filesize)
 
     # 线程数
-    thread_number = 2
+    thread_number = 4
     # 信号量，同时只允许3个线程运行
     threading.BoundedSemaphore(thread_number)
     # 默认3线程现在，也可以通过传参的方式设置线程数
@@ -98,6 +125,7 @@ def hpjav_download_mp4(url, filename='', page_url=''):
 
     # 请空并生成文件
     tempf = open(video_path, 'w')
+    print('save video path', video_path)
     tempf.close()
     # rb+ ，二进制打开，可任意位置读写
     step = math.floor(filesize / thread_number)
@@ -129,11 +157,13 @@ def hpjav_download_mp4(url, filename='', page_url=''):
 
 
 def hpjav_download(url, filename):
-    cmd = f'N_m3u8DL-CLI_v2.9.5.exe {url}'
-    # print(cmd)
+    cmd = f'N_m3u8DL-CLI_v3.0.0.exe "{url}"'
+    print(cmd)
     os.system(cmd)
 
 
 if __name__ == "__main__":
-    url = 'https://lising-39.cdnamz.me/videos/ohdpsinm1t818e7biwrx3hrzfa.mp4'
+    url = 'https://www319.ff-01.com/token=McMXFn6s49SkwvyWi0mpqA/1653408662/218.102.0.0/153/a/81/cd7ea4ecdee9075c852282c61563781a-1080p.mp4'
     hpjav_download_mp4(url, 'filename.mp4')
+    # r = requests.head("https://www.baidu.com").headers
+    # print('r', r)
