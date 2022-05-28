@@ -21,3 +21,8 @@ __pycache__/
 *.log
 *.mp4
 Downloads/
+log.txt
+video/
+*.m3u8
+imgs/
+*.exe

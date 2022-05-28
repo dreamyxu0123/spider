@@ -1,12 +1,17 @@
-import sys
-from utils import load
-sys.path.extend(load('./env_path.json'))
-from ts_download import Download_M3U8
-from flask import request, Flask, jsonify
-from hpjav.hpjav import hpjav_download_mp4
-from jable import jable_tv_download
 import json
+import sys
+import threading
 
+from utils import load, log
+
+sys.path.extend(load('./env_path.json'))
+
+from flask import Flask, jsonify, request
+
+from hpjav.hpjav import hpjav_download, hpjav_download_mp4
+from jable import jable_tv_download
+from javhdporn import javhdporn
+from ts_download import Download_M3U8
 
 # print(sys.path)
 
@@ -18,15 +23,20 @@ def hpjav():  # 视图函数
     data = request.get_data()
     json_data = json.loads(data.decode('utf-8'))
     url = json_data.get('url')
+    page_url = json_data.get('page_url')
     filename = json_data.get('filename') + '.mp4'
     video_type = json_data.get('video_type')
+    host_type = json_data.get('host_type')
+
+    if host_type == 'javhdporn':
+        t = threading.Thread(target=javhdporn, args=(page_url, url))
+        t.start()
+        return "javhdporn"
+
     if video_type == 'mp4':
         mb = hpjav_download_mp4(url, filename)
-    # print(url, filename)
     elif video_type == 'm3u8':
         Download_M3U8.start(url, filename)
-    # print('mb', mb, type(mb))
-    # Download_M3U8.start(url, filename)
     else:
         return 'None Video Type'
     return filename + '''start download  url: ''' + url
@@ -39,7 +49,40 @@ def jable_tv():  # 视图函数
     url = json_data.get('url')
     print('url', url)
     jable_tv_download(url)
-    return 'Hello World'  # response，最终给浏览器返回的内容
+    return 'Hello World'
+
+
+@app.route('/', methods=['POST'])
+def hello_world():
+    data = request.get_data()
+    json_data = json.loads(data.decode('utf-8'))
+    print('json_data', json_data)
+    video_link = json_data['video_link']
+    page_url = json_data['page_url']
+    video_type = json_data['video_type']
+    if video_type == 'mp4':
+        mb = hpjav_download_mp4(video_link, page_url=page_url)
+    # print(url, filename)
+    elif video_type == 'm3u8':
+        hpjav_download(video_link, 'filename')
+    return 'Hello World'
+
+
+@app.route('/javhdporn', methods=['POST'])
+def javhdporn_api():
+    data = request.get_data()
+    json_data = json.loads(data.decode('utf-8'))
+    page_url = json_data['href']
+    videoLink = json_data['videoLink']
+
+    t = threading.Thread(target=javhdporn, args=(page_url, videoLink))
+    t.start()
+    return "javhdporn"
+
+
+@app.route('/')
+def hello():
+    return 'Hello World'
 
 
 if __name__ == '__main__':
