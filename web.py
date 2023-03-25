@@ -63,7 +63,9 @@ def hello_world():
     page_url = json_data['page_url']
     video_type = json_data['video_type']
     if video_type == 'mp4':
-        mb = hpjav_download_mp4(video_link, page_url=page_url)
+        t = threading.Thread(target=hpjav_download_mp4, args=(video_link,))
+        t.start()
+
     # print(url, filename)
     elif video_type == 'm3u8':
         hpjav_download(video_link, 'filename')
