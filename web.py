@@ -36,7 +36,9 @@ def hpjav():  # 视图函数
     if video_type == 'mp4':
         mb = hpjav_download_mp4(url, filename)
     elif video_type == 'm3u8':
-        Download_M3U8.start(url, filename)
+        # Download_M3U8.start(url, filename)
+        t = threading.Thread(target=javhdporn, args=(page_url, url))
+        t.start()
     else:
         return 'None Video Type'
     return filename + '''start download  url: ''' + url
